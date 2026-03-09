@@ -38,18 +38,24 @@ const OPPOSITE := {
 }
 
 var open := {
-	0: {"up": false, "down": true, "right": true, "left": false},
-	1: {"up": false, "down": true, "right": false, "left": true},
-	2: {"up": false, "down": false, "right": true, "left": false},
-	3: {"up": false, "down": false, "right": false, "left": true},
-	4: {"up": false, "down": true, "right": false, "left": false},
-	5: {"up": false, "down": true, "right": true, "left": true},
-	6: {"up": true, "down": false, "right": true, "left": true},
-	7: {"up": true, "down": false, "right": true, "left": false},
-	8: {"up": true, "down": false, "right": false, "left": true},
-	9: {"up": true, "down": false, "right": false, "left": false},
-	10: {"up": true, "down": true, "right": false, "left": true},
-	11: {"up": true, "down": true, "right": true, "left": false},
+	0: {"up": "x", "down": "a", "right": "a", "left": "x"},
+	1: {"up": "x", "down": "a", "right": "x", "left": "a"},
+	2: {"up": "x", "down": "x", "right": "b", "left": "x"},
+	3: {"up": "x", "down": "x", "right": "x", "left": "b"},
+	4: {"up": "x", "down": "b", "right": "x", "left": "x"},
+	5: {"up": "x", "down": "a", "right": "a", "left": "a"},
+	6: {"up": "a", "down": "x", "right": "a", "left": "a"},
+	7: {"up": "a", "down": "x", "right": "a", "left": "x"},
+	8: {"up": "a", "down": "x", "right": "x", "left": "a"},
+	9: {"up": "b", "down": "x", "right": "x", "left": "x"},
+	10: {"up": "a", "down": "a", "right": "x", "left": "a"},
+	11: {"up": "a", "down": "a", "right": "a", "left": "x"},
+}
+
+const SOCKET_OK: Dictionary = {
+	"a": ["a", "b"],
+	"b": ["a"],
+	"x": ["x"],
 }
 
 var rng := RandomNumberGenerator.new()
@@ -59,6 +65,12 @@ func _ready() -> void:
 	print("ready")
 	rng.randomize()
 	generate()
+	
+func _input(event):
+	if event.is_action_pressed("Refresh"):
+		print("refresh")
+		rng.randomize()
+		generate()
 
 func generate() -> void:
 	initialize_cells()
@@ -145,13 +157,13 @@ func opposite_dir(dir: String) -> String:
 		"left": return "right"
 		_: return ""
 
-func get_socket(tile_def: Dictionary, dir: String) -> bool:
+func get_socket(tile_def: Dictionary, dir: String) -> String:
 	return tile_def[dir]
 
 func is_compatible(a: Dictionary, dir_from_a: String, b: Dictionary) -> bool:
 	var a_socket = get_socket(a, dir_from_a)
 	var b_socket = get_socket(b, opposite_dir(dir_from_a))
-	return a_socket == b_socket
+	return b_socket in SOCKET_OK.get(a_socket, [])
 	
 func draw_result() -> void:
 	map_layer.clear()

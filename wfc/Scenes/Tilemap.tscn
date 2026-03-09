@@ -27,8 +27,8 @@ sources/0 = SubResource("TileSetAtlasSource_mvff8")
 scale = Vector2(0.2, 0.2)
 script = ExtResource("1_yuykf")
 map_layer = NodePath("TileMapLayer")
-WIDTH = 50
-HEIGHT = 50
+WIDTH = 20
+HEIGHT = 20
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=702362553]
 tile_set = SubResource("TileSet_yuykf")
