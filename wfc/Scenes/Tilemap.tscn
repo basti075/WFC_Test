@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://bi8ceqhesgw5f"]
+
+[ext_resource type="Texture2D" uid="uid://de51gwwhom5j6" path="res://Resources/WFC_tileset.png" id="1_mvff8"]
+[ext_resource type="Script" uid="uid://bffvt3550m0iv" path="res://Scripts/wfc_test.gd" id="1_yuykf"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mvff8"]
+texture = ExtResource("1_mvff8")
+texture_region_size = Vector2i(160, 160)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_yuykf"]
+tile_size = Vector2i(160, 160)
+sources/0 = SubResource("TileSetAtlasSource_mvff8")
+
+[node name="Node2D" type="Node2D" unique_id=1009944840 node_paths=PackedStringArray("map_layer")]
+scale = Vector2(0.2, 0.2)
+script = ExtResource("1_yuykf")
+map_layer = NodePath("TileMapLayer")
+WIDTH = 50
+HEIGHT = 50
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=702362553]
+tile_set = SubResource("TileSet_yuykf")
