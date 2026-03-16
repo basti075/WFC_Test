@@ -1,34 +1,153 @@
 [gd_scene format=3 uid="uid://bi8ceqhesgw5f"]
 
-[ext_resource type="Texture2D" uid="uid://de51gwwhom5j6" path="res://Resources/WFC_tileset.png" id="1_mvff8"]
+[ext_resource type="Texture2D" uid="uid://bri32whi652ru" path="res://Resources/WFC_tileset.png" id="1_mvff8"]
 [ext_resource type="Script" uid="uid://bffvt3550m0iv" path="res://Scripts/wfc_test.gd" id="1_yuykf"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mvff8"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_yuykf"]
 texture = ExtResource("1_mvff8")
 texture_region_size = Vector2i(160, 160)
+3:3/0 = 0
+4:3/0 = 0
+5:3/0 = 0
+6:3/0 = 0
+3:4/0 = 0
+4:4/0 = 0
+5:4/0 = 0
+6:4/0 = 0
+7:4/0 = 0
+8:4/0 = 0
+9:4/0 = 0
+3:5/0 = 0
+4:5/0 = 0
+5:5/0 = 0
+6:5/0 = 0
+7:5/0 = 0
+8:5/0 = 0
+9:5/0 = 0
+3:6/0 = 0
+4:6/0 = 0
+5:6/0 = 0
+6:6/0 = 0
+4:7/0 = 0
+5:7/0 = 0
+4:8/0 = 0
+5:8/0 = 0
+4:9/0 = 0
+5:9/0 = 0
+0:0/next_alternative_id = 4
 0:0/0 = 0
+0:0/1 = 1
+0:0/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+0:0/2 = 2
+0:0/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+0:0/3 = 3
+0:0/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+1:0/next_alternative_id = 4
 1:0/0 = 0
-2:0/0 = 0
-3:0/0 = 0
-4:0/0 = 0
-5:0/0 = 0
-6:0/0 = 0
-0:1/0 = 0
+1:0/1 = 1
+1:0/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+1:0/2 = 2
+1:0/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+1:0/3 = 3
+1:0/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+1:1/next_alternative_id = 4
 1:1/0 = 0
+1:1/1 = 1
+1:1/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+1:1/2 = 2
+1:1/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+1:1/3 = 3
+1:1/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+0:1/next_alternative_id = 4
+0:1/0 = 0
+0:1/1 = 1
+0:1/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+0:1/2 = 2
+0:1/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+0:1/3 = 3
+0:1/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+2:0/next_alternative_id = 4
+2:0/0 = 0
+2:0/1 = 1
+2:0/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+2:0/2 = 2
+2:0/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+2:0/3 = 3
+2:0/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+3:0/next_alternative_id = 4
+3:0/0 = 0
+3:0/1 = 1
+3:0/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+3:0/2 = 2
+3:0/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+3:0/3 = 3
+3:0/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+4:0/next_alternative_id = 4
+4:0/0 = 0
+4:0/1 = 1
+4:0/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+4:0/2 = 2
+4:0/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+4:0/3 = 3
+4:0/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+4:1/next_alternative_id = 4
 4:1/0 = 0
+4:1/1 = 1
+4:1/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+4:1/2 = 2
+4:1/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+4:1/3 = 3
+4:1/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+5:1/next_alternative_id = 4
 5:1/0 = 0
+5:1/1 = 1
+5:1/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+5:1/2 = 2
+5:1/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+5:1/3 = 3
+5:1/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+5:0/next_alternative_id = 4
+5:0/0 = 0
+5:0/1 = 1
+5:0/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+5:0/2 = 2
+5:0/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+5:0/3 = 3
+5:0/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+6:0/next_alternative_id = 4
+6:0/0 = 0
+6:0/1 = 1
+6:0/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+6:0/2 = 2
+6:0/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+6:0/3 = 3
+6:0/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+7:0/next_alternative_id = 4
+7:0/0 = 0
+7:0/1 = 1
+7:0/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+7:0/2 = 2
+7:0/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+7:0/3 = 3
+7:0/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
+6:1/next_alternative_id = 4
 6:1/0 = 0
+6:1/1 = 1
+6:1/1/modulate = Color(0.9999998, 0.21362916, 0.8884523, 1)
+6:1/2 = 2
+6:1/2/modulate = Color(0, 0.75131655, 0.28858966, 1)
+6:1/3 = 3
+6:1/3/modulate = Color(0.8138272, 0.57630074, 0, 1)
 
-[sub_resource type="TileSet" id="TileSet_yuykf"]
+[sub_resource type="TileSet" id="TileSet_inawv"]
 tile_size = Vector2i(160, 160)
-sources/0 = SubResource("TileSetAtlasSource_mvff8")
+sources/0 = SubResource("TileSetAtlasSource_yuykf")
 
 [node name="Node2D" type="Node2D" unique_id=1009944840 node_paths=PackedStringArray("map_layer")]
 scale = Vector2(0.2, 0.2)
 script = ExtResource("1_yuykf")
 map_layer = NodePath("TileMapLayer")
-WIDTH = 20
-HEIGHT = 20
+min_length = 15
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=702362553]
-tile_set = SubResource("TileSet_yuykf")
+tile_set = SubResource("TileSet_inawv")
