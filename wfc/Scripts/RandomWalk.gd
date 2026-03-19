@@ -55,7 +55,7 @@ func generate(
 		if start_left == end_left:
 			continue
 
-		if abs(start.x - end.x) + abs(start.y - end.y) < 6:
+		if abs(start.x - end.x) + abs(start.y - end.y) < 10:
 			continue
 		
 		return {
@@ -77,10 +77,11 @@ func _walk_once(
 ) -> Array[Vector2i]:
 	var path: Array[Vector2i] = [start]
 	var visited := {start: true}
+	var last_dir: Vector2i = Vector2i.ZERO
 
 	for _i in range(step_count - 1):
 		var current: Vector2i = path[path.size() - 1]
-		var options: Array[Vector2i] = []
+		var weighted_options: Array[Dictionary] = []
 
 		for dir: Vector2i in DIRS:
 			var next := current + dir
@@ -88,14 +89,34 @@ func _walk_once(
 				continue
 			if visited.has(next):
 				continue
-			options.append(next)
 
-		if options.is_empty():
+			var weight := 1.0
+
+			if last_dir != Vector2i.ZERO:
+				if dir == last_dir:
+					# discourage going straight
+					weight = 0.35
+				elif dir == -last_dir:
+					# shouldn't happen much because previous cell is visited,
+					# but keep it low anyway
+					weight = 0.05
+				else:
+					# encourage turning
+					weight = 2.0
+
+			weighted_options.append({
+				"pos": next,
+				"dir": dir,
+				"weight": weight
+			})
+
+		if weighted_options.is_empty():
 			break
 
-		var chosen := options[rng.randi_range(0, options.size() - 1)]
-		path.append(chosen)
-		visited[chosen] = true
+		var chosen := _pick_weighted(weighted_options, rng)
+		path.append(chosen["pos"])
+		visited[chosen["pos"]] = true
+		last_dir = chosen["dir"]
 
 	return path
 
@@ -185,3 +206,18 @@ func _in_bounds(cell: Vector2i, grid_size: Vector2i) -> bool:
 		and cell.x < grid_size.x
 		and cell.y < grid_size.y
 	)
+
+func _pick_weighted(options: Array[Dictionary], rng: RandomNumberGenerator) -> Dictionary:
+	var total := 0.0
+	for option in options:
+		total += option["weight"]
+
+	var roll := rng.randf() * total
+	var accum := 0.0
+
+	for option in options:
+		accum += option["weight"]
+		if roll <= accum:
+			return option
+
+	return options[options.size() - 1]

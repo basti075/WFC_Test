@@ -147,6 +147,7 @@ sources/0 = SubResource("TileSetAtlasSource_yuykf")
 scale = Vector2(0.2, 0.2)
 script = ExtResource("1_yuykf")
 map_layer = NodePath("TileMapLayer")
+step_count = 25
 min_length = 15
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=702362553]
