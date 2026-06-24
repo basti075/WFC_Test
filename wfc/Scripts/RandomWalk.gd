@@ -51,11 +51,12 @@ func generate(
 
 		var start_left := start.x < grid_size.x / 2
 		var end_left := end.x < grid_size.x / 2
+		var min_distance: int = mini(10, grid_size.x + grid_size.y - 4)
 
 		if start_left == end_left:
 			continue
 
-		if abs(start.x - end.x) + abs(start.y - end.y) < 10:
+		if abs(start.x - end.x) + abs(start.y - end.y) < min_distance:
 			continue
 		
 		return {

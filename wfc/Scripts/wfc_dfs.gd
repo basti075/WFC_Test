@@ -4,10 +4,28 @@ extends Node2D
 @export var WIDTH := 10
 @export var HEIGHT := 10
 
+@export var exact_path := true
+@export var max_restart_count := 500
+
+# Dynamic tile weights.
+# Lower = rarer, higher = more common.
+@export var dead_end_weight := 0.4
+@export var corner_weight := 2.0
+@export var straight_weight := 1.5
+@export var tee_weight := 0.7
+@export var cross_weight := 0.15
+
+# Extra dynamic modifiers.
+@export var prefer_path_tiles := true
+@export var path_weight_multiplier := 2.0
+@export var non_path_weight_multiplier := 0.5
+@export var border_dense_penalty := 0.4
+@export var dense_tile_penalty := 0.5
+@export var cross_tile_penalty := 0.25
+
 var walk_required: Dictionary = {}
 var walk_flags: Dictionary = {}
 var walk_path: Array[Vector2i] = []
-@export var exact_path := true
 
 var start_pos: Vector2i = Vector2i.ZERO
 var end_pos: Vector2i = Vector2i.ZERO
@@ -82,31 +100,25 @@ var cells := {}
 
 
 func _ready() -> void:
-	restart_count = 0
 	print("ready")
 	rng.randomize()
-
-	generate_dfs_constraint()
 	generate()
 
 
 func _input(event) -> void:
 	if event.is_action_pressed("Refresh"):
 		print("refresh")
-		restart_count = 0
 		rng.randomize()
-
-		generate_dfs_constraint()
 		generate()
 
 
-func generate_dfs_constraint() -> void:
+func generate_dfs_constraint() -> bool:
 	var dfs := DFSGridConstraint.new()
 	var result: Dictionary = dfs.generate(Vector2i(WIDTH, HEIGHT), rng.randi())
 
 	if result.is_empty():
 		push_error("DFS generation failed")
-		return
+		return false
 
 	walk_required = result.get("required", {})
 	walk_flags = result.get("flags", {})
@@ -114,31 +126,56 @@ func generate_dfs_constraint() -> void:
 	start_pos = result.get("start", Vector2i.ZERO)
 	end_pos = result.get("end", Vector2i.ZERO)
 
+	return true
+
 
 func generate() -> void:
-	initialize_cells()
+	restart_count = 0
 
+	while restart_count < max_restart_count:
+		var dfs_ok := generate_dfs_constraint()
+
+		if not dfs_ok:
+			restart_count += 1
+			continue
+
+		var initialized := initialize_cells()
+
+		if not initialized:
+			restart_count += 1
+			print("Initialization failed. Restart Count:", restart_count)
+			continue
+
+		var success := run_wfc_once()
+
+		if success:
+			draw_result()
+			return
+
+		restart_count += 1
+		print("Contradiction hit. Restart Count:", restart_count)
+
+	push_error("WFC failed after %d restarts" % max_restart_count)
+
+
+func run_wfc_once() -> bool:
 	while true:
 		var pos = find_lowest_entropy_cell()
 
 		if pos == null:
-			break
+			return true
 
 		collapse_cell(pos)
 
 		var ok := propagate(pos)
 
 		if not ok:
-			restart_count += 1
-			print("Contradiction hit. Restart Count:", restart_count)
+			return false
 
-			generate()
-			return
-
-	draw_result()
+	return false
 
 
-func initialize_cells() -> void:
+func initialize_cells() -> bool:
 	cells.clear()
 
 	for y in range(HEIGHT):
@@ -159,9 +196,13 @@ func initialize_cells() -> void:
 				options.append(tile_id)
 
 			if options.is_empty():
-				push_error("No valid tile options at position: %s" % pos)
+				print("No valid tile options at position: ", pos)
+				cells[pos] = []
+				return false
 
 			cells[pos] = options
+
+	return true
 
 
 func find_lowest_entropy_cell():
@@ -181,7 +222,7 @@ func find_lowest_entropy_cell():
 
 func collapse_cell(pos: Vector2i) -> void:
 	var options: Array = cells[pos]
-	var chosen = options[rng.randi_range(0, options.size() - 1)]
+	var chosen := pick_weighted_tile(options, pos)
 	cells[pos] = [chosen]
 
 
@@ -238,12 +279,31 @@ func is_compatible(a: Dictionary, dir_from_a: String, b: Dictionary) -> bool:
 
 
 func draw_result() -> void:
+	if map_layer == null:
+		push_error("map_layer is not assigned. Drag your TileMapLayer into the exported Map Layer field.")
+		return
+
 	map_layer.clear()
 
 	for y in range(HEIGHT):
 		for x in range(WIDTH):
 			var pos := Vector2i(x, y)
-			var tile_id: int = cells[pos][0]
+
+			if not cells.has(pos):
+				continue
+
+			var options: Array = cells[pos]
+
+			if options.is_empty():
+				push_error("Cell has no tile options at: %s" % pos)
+				continue
+
+			var tile_id: int = options[0]
+
+			if not TILE_TO_ATLAS.has(tile_id):
+				push_error("Missing TILE_TO_ATLAS entry for tile_id: %d" % tile_id)
+				continue
+
 			var tile_info: Dictionary = TILE_TO_ATLAS[tile_id]
 
 			var alt := ALT_NORMAL
@@ -290,18 +350,100 @@ func tile_matches_walk_constraint(
 
 	for dir_name in DIRS.keys():
 		var must_be_open: bool = required_dirs.get(dir_name, false)
-
-		# Any non-x socket counts as a connector.
-		# So both "a" and "b" satisfy DFS-required connectivity.
 		var is_open: bool = sockets[dir_name] != "x"
 
-		# DFS required this connector, so WFC may not remove it.
 		if must_be_open and not is_open:
 			return false
 
-		# Optional mode: force the exact DFS tree shape.
-		# Leave exact_path = false if you want WFC to add extra connectors.
 		if exact_match and must_be_open != is_open:
 			return false
 
 	return true
+
+
+# -------------------------
+# Weighted tile selection
+# -------------------------
+
+func get_connector_count(tile_id: int) -> int:
+	var sockets: Dictionary = open[tile_id]
+	var count := 0
+
+	for dir_name in DIRS.keys():
+		if sockets[dir_name] != "x":
+			count += 1
+
+	return count
+
+
+func is_straight_tile(tile_id: int) -> bool:
+	var sockets: Dictionary = open[tile_id]
+
+	var vertical: bool = sockets["up"] != "x" and sockets["down"] != "x" and sockets["left"] == "x" and sockets["right"] == "x"
+	var horizontal: bool = sockets["left"] != "x" and sockets["right"] != "x" and sockets["up"] == "x" and sockets["down"] == "x"
+
+	return vertical or horizontal
+
+
+func get_base_tile_weight(tile_id: int) -> float:
+	var connector_count := get_connector_count(tile_id)
+
+	if connector_count <= 1:
+		return dead_end_weight
+
+	if connector_count == 2:
+		if is_straight_tile(tile_id):
+			return straight_weight
+
+		return corner_weight
+
+	if connector_count == 3:
+		return tee_weight
+
+	if connector_count >= 4:
+		return cross_weight
+
+	return 1.0
+
+
+func get_dynamic_tile_weight(tile_id: int, pos: Vector2i) -> float:
+	var weight := get_base_tile_weight(tile_id)
+	var connector_count := get_connector_count(tile_id)
+
+	if prefer_path_tiles and walk_flags.has(pos):
+		weight *= path_weight_multiplier
+	else:
+		weight *= non_path_weight_multiplier
+
+	if connector_count >= 3:
+		weight *= dense_tile_penalty
+
+	if connector_count == 4:
+		weight *= cross_tile_penalty
+
+	if pos.x == 0 or pos.y == 0 or pos.x == WIDTH - 1 or pos.y == HEIGHT - 1:
+		if connector_count >= 3:
+			weight *= border_dense_penalty
+
+	return maxf(weight, 0.01)
+
+
+func pick_weighted_tile(options: Array, pos: Vector2i) -> int:
+	var total_weight := 0.0
+
+	for tile_id in options:
+		total_weight += get_dynamic_tile_weight(tile_id, pos)
+
+	if total_weight <= 0.0:
+		return options[rng.randi_range(0, options.size() - 1)]
+
+	var roll := rng.randf() * total_weight
+	var accum := 0.0
+
+	for tile_id in options:
+		accum += get_dynamic_tile_weight(tile_id, pos)
+
+		if roll <= accum:
+			return tile_id
+
+	return options[options.size() - 1]
